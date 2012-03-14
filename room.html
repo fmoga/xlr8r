@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <style>
+      body {
+        text-align: center;
+      }
+      canvas {
+        border: 1px solid #777;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="400" height="400"></canvas> 
+  
+    <script src="/socket.io/socket.io.js"></script>  
+    <script type="text/javascript">
+      var AUDIO_URL = '/public/human-voice.mp4';
+      var CENTER_COLOR = "rgb(0,200,0)";
+      var DOT_COLOR = "rgb(200,0,0)";
+      var WHITE = "rgb(255,255,255)";
+      var RADIUS = 10;
+      var context;
+      var source;
+      var panner;
+      var canvas;
+      var canvasWidthDiv2;
+      var canvasHeightDiv2;
+      var lastDot = {x: 0, y: 0};
+
+      window.onload = init;
+
+      function init() {
+        canvas = document.getElementById("canvas");
+        canvasWidthDiv2 = canvas.width/2;
+        canvasHeightDiv2 = canvas.height/2;
+        canvas = canvas.getContext('2d');
+        updateDotPosition(canvasWidthDiv2, canvasHeightDiv2);
+
+        context = new webkitAudioContext();
+        source = context.createBufferSource();
+        source.loop = true;
+        panner = context.createPanner();
+        panner.setPosition(0,0,0);
+
+        source.connect(panner);
+        panner.connect(context.destination);
+
+        setAudioSource(AUDIO_URL);
+        source.noteOn(context.currentTime);
+      }
+
+      function updateDotPosition(x, y) {
+        eraseDot(lastDot.x, lastDot.y); 
+        drawCenter();
+        drawDot(x, y, RADIUS, DOT_COLOR);
+        lastDot = {x: x, y: y};
+      }
+
+      function drawCenter() {
+        drawDot(canvasWidthDiv2, canvasHeightDiv2, RADIUS, CENTER_COLOR);
+      }
+
+      function eraseDot(x, y) {
+        drawDot(x, y, RADIUS+5, WHITE);
+      }
+
+      function drawDot(x, y, radius, color) {
+        canvas.fillStyle = color;
+        canvas.beginPath();
+        canvas.arc(x, y , radius, 0, Math.PI * 2, true);
+        canvas.fill();
+      }
+
+      function setAudioSource(url) {
+          var request = new XMLHttpRequest();
+          request.open("GET", url, true);
+          request.responseType = "arraybuffer";
+          request.onload = function() { 
+            source.buffer = context.createBuffer(request.response, true);
+          }
+          request.send();
+      }
+
+      var socket = io.connect('/subscribe');
+      socket.on('connect', function () {
+        socket.on('update', function(data) {
+          x = -data.y;
+          y = data.x;
+          updateDotPosition(canvasWidthDiv2 + canvasWidthDiv2 * x / 10, canvasHeightDiv2 + canvasHeightDiv2 * y / -10);
+          panner.setPosition(x/2, y/2, 0);
+        });
+      });
+    </script>
+  </body>
+</html>

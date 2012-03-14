@@ -1,0 +1,57 @@
+<html>
+<head>
+  <title>XLR8R</title>
+  <link rel="stylesheet" type="text/css" href="/public/soundManager/360player.css" />
+  <link rel="stylesheet" type="text/css" href="/public/soundManager/360player-visualization.css" /> 
+  <style>
+    h1, #slider-box {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>XLR8R Player</h1>
+  <div class="ui360 ui360-vis">
+    <a href='/public/Monsoon - Serenity Now.mp3' type='audio/mpeg'></a>
+  </div>
+  <div id="slider-box">
+    <input id="slider" type="range" min="-100" max="100" value="0" step="1" disabled="disabled"/>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="/public/soundManager/soundmanager2-nodebug-jsmin.js"></script>
+  <script type="text/javascript" src="/public/soundManager/berniecode-animator.js"></script>
+  <script type="text/javascript" src="/public/soundManager/360player.js"></script>
+  <script>
+    soundManager.url = '/public/soundManager/swf/';
+    soundManager.flashVersion = 9;
+    soundManager.useFlashBlock = false;
+    soundManager.waitForWindowLoad = true;
+    soundManager.setVolume(100);
+    threeSixtyPlayer.config.autoPlay = true;
+    // threeSixtyPlayer.config.useEQData = true;
+    // threeSixtyPlayer.config.useWaveformData = true;
+    // threeSixtyPlayer.config.waveformDataLineRatio = 0;
+    threeSixtyPlayer.onfinish = function() {
+    }
+    soundManager.onready(function() {
+      threeSixtyPlayer.init();
+    });
+
+    var THRESHOLD = 95;
+    var BALANCE_MAX = 100;
+    var slider = document.getElementById("slider");
+    var socket = io.connect('/subscribe');
+    socket.on('connect', function () {
+      socket.on('update', function(data) {
+        balance = data.y * (-10);
+        if (balance > THRESHOLD) balance = BALANCE_MAX;
+        if (balance < -THRESHOLD) balance = -BALANCE_MAX;
+        slider.value = balance;
+        threeSixtyPlayer.sounds[0].setPan(balance); 
+      });
+    });
+  </script>
+</body>
+</html>

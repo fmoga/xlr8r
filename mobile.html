@@ -1,0 +1,51 @@
+<html>
+<head>
+  <title>XLR8R</title>
+  <meta name="viewport" content="width=device-width,user-scalable=no" />
+  <style>
+    html {
+      -webkit-transform: rotate(90deg);
+    }
+
+    input {
+      width: 100%;
+      // -webkit-appearance: slider-vertical;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>XLR8R</h1>
+  <div id="yes">
+    <h3>Move the sound on connected devices using the accelerometer</h3>
+  </div>
+  <div id="no">
+    <h3>Your browser does not support Device Orientation and Motion API. Try this sample with iPhone, iPod or iPad with iOS 4.2+.</h3>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    INTERVAL = 150;
+    last = 0;
+
+    var socket = io.connect('/publish');
+    socket.on('connect', function () {
+    });
+
+    if (window.DeviceMotionEvent) {
+      document.getElementById("no").style.display="none";
+      window.ondevicemotion = function(event) {
+        now = new Date().getTime();
+        if (now - last > INTERVAL) {
+          ax = event.accelerationIncludingGravity.x;
+          ay = event.accelerationIncludingGravity.y;
+          az = event.accelerationIncludingGravity.z;
+          socket.emit('update', {x: ax, y: ay, z: az});
+          last = now;
+        }
+      }
+    } else {
+      document.getElementById("yes").style.display="none";
+    }
+  </script>
+</body>
+</html>
