@@ -7,13 +7,12 @@ XLR8R is a small web-based app that creates 3D sound effect based on acceleromet
 
 ### Install
 
-* Install node.js and npm  
-* Run `npm install` to fetch node dependencies (express framework and socket.io)
-* Run `node server.js`
+* Install [node.js][1] and [npm][2]  
+* Run `npm install` to fetch node dependencies ([express][3] framework and [socket.io][4])
 
 ### Having fun with XLR8R
 
-Once the XLR8R server is started:
+* Start the server by running `node server.js`
 * Plug in headphones into your computer
 * Open `http://<server host>:8888/room` on your computer's browser
 * Open `http://<server host>:8888` on your iPhone/iPod
@@ -22,3 +21,8 @@ Once the XLR8R server is started:
 ### Notes
 
 Chrome Web Audio support on Linux doesn't output clear sound, seems to work better on Windows.
+
+[1]: http://nodejs.org/
+[2]: http://npmjs.org/
+[3]: http://expressjs.com/
+[4]: http://socket.io/
