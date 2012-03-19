@@ -1,6 +1,7 @@
 # XLR8R
 
 XLR8R is a small web-based app that creates 3D sound effect based on accelerometer data sent by iOS 4.2+ devices. It uses the following technologies:
+
 * DeviceOrientation API (available in Mobile Safari on iOS 4.2+ devices)
 * Web Audio API (available in latest versions of Google Chrome)
 * Websocket support in socket.io (node.js module)
